@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Emgu.CV" Version="4.5.1.4349" />
+    <PackageReference Include="Emgu.CV.runtime.windows" Version="4.5.1.4349" />
+    <PackageReference Include="Emgu.CV.UI" Version="4.5.1.4349" />
+    <PackageReference Include="OpenCvSharp3-AnyCPU" Version="3.4.1.20181108" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MyFilterOpenCVSharp">
+      <HintPath>..\..\MyFilterOpenCVSharp\MyFilterOpenCVSharp\bin\Debug\netcoreapp3.1\MyFilterOpenCVSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

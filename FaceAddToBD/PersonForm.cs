@@ -20,15 +20,28 @@ namespace FaceAddToBD
             this.faceList = faceList;
             this.detectedIm = detectedIm;
             this.DialogResult = DialogResult.Cancel;
-            this.button1.Focus();
             InitializeComponent();
         }
 
-        
+
         private void button1_Click(object sender, EventArgs e)
         {
             FaceData tmpFaceData = new FaceData();
-            
+            int countId = 0;
+            foreach (FaceData fd in faceList)
+            {
+                if (fd.PersonName == textBox1.Text)
+                {
+                    countId = fd.Id;
+                    break;
+                }
+                else if (fd.Id >= countId)
+                {
+                    countId = fd.Id;
+                    countId++;
+                }
+            }
+            tmpFaceData.Id = countId;
             tmpFaceData.PersonName = textBox1.Text;
             tmpFaceData.CreateDate = DateTime.Now;
             tmpFaceData.FaceImage = detectedIm.Resize(100, 100, Emgu.CV.CvEnum.Inter.Cubic);

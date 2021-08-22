@@ -24,7 +24,7 @@ namespace FaceAddToBD
 
         internal static void TrainRecognizer(int countComponents)
         {
-            recognizer = new EigenFaceRecognizer(countComponents, 1.8 * Math.Pow(10.0, 10.0));
+         //   recognizer = new EigenFaceRecognizer(countComponents, 1.8 * Math.Pow(10.0, 10.0));
             recognizer.Train(Database.imageList, Database.labelList);
             recognizer.Write(Config.Config.EigenFaceRecognizerPath);
         }

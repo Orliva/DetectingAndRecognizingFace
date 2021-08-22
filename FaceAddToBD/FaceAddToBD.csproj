@@ -10,7 +10,6 @@
     <PackageReference Include="Emgu.CV" Version="4.5.1.4349" />
     <PackageReference Include="Emgu.CV.runtime.windows" Version="4.5.1.4349" />
     <PackageReference Include="Emgu.CV.UI" Version="4.5.1.4349" />
-    <PackageReference Include="OpenCvSharp3-AnyCPU" Version="3.4.1.20181108" />
   </ItemGroup>
 
   <ItemGroup>

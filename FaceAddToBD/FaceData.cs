@@ -10,5 +10,7 @@ namespace FaceAddToBD
         public Image<Gray, byte> FaceImage { get; set; }
         public DateTime CreateDate { get; set; }
 
+        public int Id { get; set; }
+
     }
 }

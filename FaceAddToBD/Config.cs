@@ -26,6 +26,8 @@
         public static double MinNeighborsCascade = 3;
         public static System.Drawing.Size MinSizeCascade = default;
         public static System.Drawing.Size MaxSizeCascade = default;
+
+        public static string TESTPATH = @"Source\Test.txt";
     }
 
     public static class HaarCascadePath

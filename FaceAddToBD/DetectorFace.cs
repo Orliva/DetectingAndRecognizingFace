@@ -7,7 +7,10 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Face;
 using Config;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Reflection;
+using System.Linq.Expressions;
 
 namespace FaceAddToBD
 {
@@ -16,7 +19,7 @@ namespace FaceAddToBD
         ///Дописать dispose к объектам, которые нужно освобождать (using () {}) или .Dispose();
         #region Field
         //public Emgu.CV.UI.HistogramBox histogramBox;
-        //public TrackBar trackBar;
+        public TrackBar trackBar;
         public Emgu.CV.UI.ImageBox imageBox1;
         public Emgu.CV.UI.ImageBox imageBox2;
         public Form1 form;
@@ -28,8 +31,10 @@ namespace FaceAddToBD
         private readonly Pen pen;
         private static readonly CascadeClassifier classifier =
             new CascadeClassifier(Config.HaarCascadePath.GetHaarCascadePath(HaarCascade.Haarcascade_frontalface_alt_tree));
-        private readonly Image<Hsv, byte> im;
+        //private readonly Image<Hsv, byte> im;
+        private readonly Image<Bgr, byte> im;
         private Image<Gray, byte> detectedIm;
+        private Image<Gray, byte> grayIm;
 
         //private Image<Hsv, byte> HsvIm;
         //private DenseHistogram histogram = new DenseHistogram(255, new RangeF(0, 255)); //Histogram
@@ -38,6 +43,7 @@ namespace FaceAddToBD
         #region Constructor
         public DetectorFace(Form1 form)
         {
+            
             this.form = form;
             imageBox1 = new Emgu.CV.UI.ImageBox
             {
@@ -61,19 +67,19 @@ namespace FaceAddToBD
                 BorderStyle = System.Windows.Forms.BorderStyle.None,
                 BackgroundImageLayout = System.Windows.Forms.ImageLayout.Tile
             };
-            /*//trackBar
+            //trackBar
             trackBar = new TrackBar()
             {
-                Location = new Point(),
-                Size = new Size(),
+                Location = new Point(391, 369),
+                Size = new Size(392, 56),
                 Name = "trackBar",
                 TabIndex = 2,
                 TabStop = false,
                 TickFrequency = 1,
                 Maximum = 255,
                 Minimum = 0,
-                Value = 50
-            };*/
+                Value = 50,
+            };
             /*///HistogramBox
             histogramBox = new Emgu.CV.UI.HistogramBox
             {
@@ -86,34 +92,82 @@ namespace FaceAddToBD
                 BorderStyle = System.Windows.Forms.BorderStyle.None,
                 BackgroundImageLayout = System.Windows.Forms.ImageLayout.Tile,
             };*/
+        //    this.form.Controls.Add(trackBar);
             this.form.Controls.Add(imageBox1);
             this.form.Controls.Add(imageBox2);
             // this.form.Controls.Add(histogramBox);
 
             capture = new VideoCapture(Config.Config.DefaultCameraIndex, VideoCapture.API.Any);
+         /*   form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Zoom));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.WhiteBalanceRedV));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.WhiteBalanceBlueU));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.WbTemperature));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.TriggerDelay));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Trigger));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Tilt));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Temperature));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Sharpness));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Settings));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Saturation));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.SarNum));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.SarDen));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Roll));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Rectification));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.PvapiPixelFormat));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.PvapiFrameStartTriggerMode));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Pan));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Monochrome));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Mode));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.MaxDC1394));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.IsoSpeed));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Iris));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Hue));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Gamma));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Gain));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Fps));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.FourCC));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Format));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Focus));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Exposure));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.ConvertRgb));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Contrast));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Channel));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Buffersize));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Brightness));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Backlight));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Backend));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.AutoWb));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.Autofocus));
+            form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.AutoExposure));
+         */
             capture.SetCaptureProperty(CapProp.FrameWidth, imageBox1.Width);
             capture.SetCaptureProperty(CapProp.FrameHeight, imageBox1.Height);
+            capture.SetCaptureProperty(CapProp.Fps, 30.0);
 
             pen = new Pen(Color.Red, 3);
 
             // histogramBox.GenerateHistogram("hist1", Color.Red, HsvIm.Mat, 256, HsvIm.Mat. );
             // histogramBox.GenerateHistograms(HsvIm, 250);
             // HsvIm = capture.QueryFrame().ToImage<Hsv, byte>();
-            // TrackBar.Scroll += trackBar_Scroll; ///trackBar
-            im = capture.QueryFrame().ToImage<Hsv, byte>();
+            Database.TryRestoreDB();
+            trackBar.Scroll += TrackBar_Scroll; ///trackBar
+            im = capture.QueryFrame().ToImage<Bgr, byte>();
+            detectedIm = null;
+            grayIm = null;
             capture.ImageGrabbed += Capture_ImageGrabbed;
-            pen = new Pen(Color.Green, 4);
+         //   capture.Grab();
+           // capture.Start();
         }
         #endregion
         #region MethodForTrackBar
         private void HandBinaryForTrackBar()
         {
-            int trackbar = form.trackBar1.Value;
+            int trackbar = trackBar.Value;
             form.textBox1.Text = trackbar.ToString();
-                using (Image<Gray, Byte> Gray = detectedIm.ThresholdBinary(new Gray(trackbar), new Gray(255)))
+  //              using (Image<Gray, Byte> Gray = detectedIm.ThresholdBinary(new Gray(trackbar), new Gray(255)))
                 {
-                    imageBox1.BackgroundImage = Gray.ToBitmap();
-                    detectedIm = detectedIm.ThresholdBinary(new Gray(trackbar), new Gray(255));
+    //                imageBox1.BackgroundImage = Gray.ToBitmap();
+      //              detectedIm = detectedIm.ThresholdBinary(new Gray(trackbar), new Gray(255));
                 }
             detectedIm._EqualizeHist();
             faces = classifier.DetectMultiScale(detectedIm, 1.05, 1);
@@ -214,26 +268,42 @@ namespace FaceAddToBD
             capture.Grab();
             capture.Start();
         }
-        public void StopDetector() => capture.Stop();
+        public void StopDetector()
+        {
+            capture.Stop(); 
+            using (StreamWriter sw = new StreamWriter(Config.Config.TESTPATH, true))
+            {
+      //          sw.WriteLine((((double)countSucces / (double)count) * (double)100).ToString() + "%");
+        //        sw.WriteLine("CountTest = " + count.ToString());
+          //      sw.WriteLine("NameTested = " + "Ivan");
+            }
+            count = 0;
+            countSucces = 0;
+        }
 
         public void PauseDetector() => capture.Pause();
 
         private void Capture_ImageGrabbed(object sender, EventArgs e)
         {
             capture.Retrieve(im);
-            faces = classifier.DetectMultiScale(im);
-            detectedIm = im.Convert<Gray, byte>();
+            //faces = classifier.DetectMultiScale(im, 1.1, 0);
+            grayIm = im.Convert<Gray, byte>();
+            faces = classifier.DetectMultiScale(grayIm, 1.1, 0);
             bm2 = im.ToBitmap();
-            if (faces != null)
+           // bm2 = detectedIm.ToBitmap();
+            if (faces.Length != 0)
             {
                 graphics = Graphics.FromImage(bm2);
+                detectedIm = grayIm.GetSubRect(faces[0]);///Самый маленький квадрат
                 foreach (Rectangle face in faces)
                 {
                     graphics.DrawRectangle(pen, face);
                 }
-                faces = null;
+                //if (detectedIm != null)
+                 //   imageBox1.BackgroundImage = detectedIm.ToBitmap();
             }
             imageBox2.BackgroundImage = bm2;
+         //   TEST();
         }
 
         public void AddFace()
@@ -265,7 +335,22 @@ namespace FaceAddToBD
            // Database.faceList[^1].FaceImage.Save(Config.Config.FacePhotosPath + "Oly" + (^1) + Config.Config.ImageFileExtension);
             using (StreamWriter writer = new StreamWriter(Config.Config.FaceListTextFile, true))
             {
-                writer.WriteLine(String.Format("face{0}:{1}", Database.faceList.Count, Database.faceList[^1].PersonName));
+                static bool isNameInclude()
+                {
+                    foreach (string str in Database.nameList)
+                    {
+                        if (str == Database.faceList[^1].PersonName)
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                if (!isNameInclude())
+                {
+                    Database.nameList.Add(Database.faceList[^1].PersonName);
+                    writer.WriteLine(String.Format("face{0}:{1}", Database.faceList[^1].Id, Database.faceList[^1].PersonName));
+                }
                 writer.Close();
             }
 
@@ -274,17 +359,104 @@ namespace FaceAddToBD
                 MessageBox.Show("Something went wrong! Retry please!");
                 return;
             }
-            MessageBox.Show("Person added to database! Waiting \"successful message\"!(Retrain Recoginazer...)");
-            RecognizeFace.TrainRecognizer(Database.faceList.Count); //Переписать на вызов в отдельный поток Task
+            MessageBox.Show("Person added to database! Press \"OK\" and waiting \"successful message\"!(Retrain Recoginazer...)");
+            RecognizeFace.TrainRecognizer(Database.nameList.Count); //Переписать на вызов в отдельный поток Task
             ///Функция тренировки
             MessageBox.Show("Successful.");
+            detectedIm = null;
             capture.Start();
+        }
+
+
+        public void AddFaceINFOTO()
+        {
+            FaceData faceData = new FaceData();
+            faceData.PersonName = "George Bush";
+            Database.faceList.Add(faceData);
+            Database.nameList.Add(Database.faceList[^1].PersonName);
+            //531
+            Image<Gray, byte> tmpIm;
+            Bitmap tmpBitmap;
+       //     Image asdf;
+            //  for (int i = 1; i < 531; i++)
+            //{
+         //   int j = 1;
+           //     foreach (string fileName in Directory.EnumerateFiles(@"lfw-bush\lfw\George_W_Bush\"))
+             //   {
+               //     asdf = Image.FromFile(fileName);
+                 //   
+                   //     asdf.Save(@"lfw-bush\lfw\George_W_Bush\George_W_Bush_" + HelpGetPhoto(j++) + ".bmp");
+                    
+                    //System.IO.File.Delete(fileName);
+                //}
+            //}
+            for (int i = 1; i < 10; i++)
+            {
+                tmpBitmap = Bitmap.FromFile(@"lfw-bush\lfw\George_W_Bush\George_W_Bush_" + HelpGetPhoto(i) + ".bmp") as Bitmap;
+                tmpIm = tmpBitmap.ToImage<Gray, byte>();
+                TryGetFacePhoto(ref tmpIm, ref tmpBitmap);
+              //  Thread.Sleep(50);
+            }
+            RecognizeFace.TrainRecognizer(Database.faceList.Count); //Переписать на вызов в отдельный поток Task
+            MessageBox.Show("Successful.");
+
+        }
+
+        private void TryGetFacePhoto(ref Image<Gray, byte> im, ref Bitmap bm)
+        {
+            ///Обязательно остановить камеру!!!
+            // im = im.Resize(100, 100, Inter.Cubic);
+            Image<Gray, byte> tmpIm;
+            tmpIm = null;
+            Rectangle[] tmpRect = null;
+
+            tmpRect = classifier.DetectMultiScale(im, 1.1, 0);
+            if (im != null)
+            {
+                graphics = Graphics.FromImage(bm);
+                foreach (Rectangle face in tmpRect)
+                {
+                    graphics.DrawRectangle(pen, face);
+                    tmpIm = im.GetSubRect(face).Resize(100, 100, Inter.Cubic);
+                }
+                FaceData fd = new FaceData();
+            //    fd.FaceImage = tmpIm;
+                fd.PersonName = Database.faceList[^1].PersonName;
+                Database.faceList.Remove(Database.faceList[^1]);
+                Database.faceList.Add(fd);
+                if (!Database.AddToBasePerson(classifier)) 
+                {
+          //          MessageBox.Show("Something went wrong! Retry please!");
+                    return;
+                }
+            //    MessageBox.Show("Person added to database! Press \"OK\" and waiting \"successful message\"!(Retrain Recoginazer...)");
+                ///Функция тренировки
+              //  MessageBox.Show("Successful.");
+                tmpIm = null;
+                //if (detectedIm != null)
+                //   imageBox1.BackgroundImage = detectedIm.ToBitmap();
+            }
+            imageBox1.Invoke(new Func<Bitmap, bool>(qwer), new object[] { bm });
+
+        }
+        bool qwer(Bitmap bm)
+        {
+            imageBox1.BackgroundImage = bm;
+            return true;
+        }
+        private string HelpGetPhoto(int i)
+        {
+            if (i < 10)
+                return "000" + i;
+            else if (i < 100) return "00" + i;
+            else if (i < 1000) return "0" + i;
+            return "";
         }
 
         public void ValidFace()
         {
             form.textBox1.Text = "";
-            if (Database.faceList.Count > 0)
+            if (Database.nameList.Count > 0)
             {
                 //Eigen Face Algorithm
                 FaceRecognizer.PredictionResult result = RecognizeFace.recognizer.Predict(detectedIm.Resize(100, 100, Inter.Cubic));
@@ -294,6 +466,45 @@ namespace FaceAddToBD
                     form.textBox1.Text = Database.nameList[result.Label];
             }
         }
+        public string ValidFace(double asdf)
+        {
+
+            if (Database.nameList.Count > 0)
+            {
+                //Eigen Face Algorithm
+                FaceRecognizer.PredictionResult result = RecognizeFace.recognizer.Predict(detectedIm.Resize(100, 100, Inter.Cubic));
+                if (result.Label == -1)
+                    return "No face in database!";
+                else
+                     return Database.nameList[result.Label];
+            }
+            return "";
+        }
+
+        public void TEST()
+        {
+            TEST_("qwe");
+        }
+        double count = 0;
+        double countSucces = 0;
+        private void TEST_(string NAME)
+        {
+            count++;
+            if (ValidFace(count) == NAME)
+                countSucces++;
+            if (count == 300)
+                StopDetector();
+          //  asdf(countSucces, count);
+        }
+        bool asdf(long countSucces, long count)
+        {
+            using (StreamWriter sw = new StreamWriter(Config.Config.TESTPATH, true))
+            {
+                sw.WriteLine(((countSucces / count) * 100).ToString() + "%");
+            }
+            return true;
+        }
+
         #endregion
     }
 }

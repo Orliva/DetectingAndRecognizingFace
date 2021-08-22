@@ -32,5 +32,13 @@ namespace FaceAddToBD
 
         //Удалить
         private void DeleteBtn_Click(object sender, EventArgs e) => Database.DeleteAllSource();
+
+        private void PhotoAddFaceBtn_Click(object sender, EventArgs e) => detectorFace.AddFaceINFOTO();// Task.Run(new Action(detectorFace.AddFaceINFOTO));
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //Task.Run(new Action(detectorFace.TEST));
+            detectorFace.TEST();
+        }
     }
 }

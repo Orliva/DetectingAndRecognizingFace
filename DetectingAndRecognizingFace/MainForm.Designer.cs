@@ -1,6 +1,6 @@
 ﻿namespace FaceAddToBD
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -13,6 +13,7 @@
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
+            detectorFace.Dispose();
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -34,17 +35,15 @@
             this.AddFaceBtn = new System.Windows.Forms.Button();
             this.ValidFaceBtn = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.DeleteBtn = new System.Windows.Forms.Button();
-            this.PhotoAddFaceBtn = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.TestBtn = new System.Windows.Forms.Button();
+            this.AddFaceInPhotoBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // StartBtn
             // 
-            this.StartBtn.Location = new System.Drawing.Point(12, 176);
+            this.StartBtn.Location = new System.Drawing.Point(12, 433);
             this.StartBtn.Name = "StartBtn";
-            this.StartBtn.Size = new System.Drawing.Size(262, 40);
+            this.StartBtn.Size = new System.Drawing.Size(165, 40);
             this.StartBtn.TabIndex = 3;
             this.StartBtn.Text = "Start";
             this.StartBtn.UseVisualStyleBackColor = true;
@@ -52,9 +51,9 @@
             // 
             // PauseBtn
             // 
-            this.PauseBtn.Location = new System.Drawing.Point(10, 222);
+            this.PauseBtn.Location = new System.Drawing.Point(183, 433);
             this.PauseBtn.Name = "PauseBtn";
-            this.PauseBtn.Size = new System.Drawing.Size(291, 40);
+            this.PauseBtn.Size = new System.Drawing.Size(165, 40);
             this.PauseBtn.TabIndex = 4;
             this.PauseBtn.Text = "Pause";
             this.PauseBtn.UseVisualStyleBackColor = true;
@@ -62,9 +61,9 @@
             // 
             // StopBtn
             // 
-            this.StopBtn.Location = new System.Drawing.Point(10, 268);
+            this.StopBtn.Location = new System.Drawing.Point(354, 433);
             this.StopBtn.Name = "StopBtn";
-            this.StopBtn.Size = new System.Drawing.Size(262, 40);
+            this.StopBtn.Size = new System.Drawing.Size(165, 40);
             this.StopBtn.TabIndex = 5;
             this.StopBtn.Text = "Stop";
             this.StopBtn.UseVisualStyleBackColor = true;
@@ -72,9 +71,9 @@
             // 
             // AddFaceBtn
             // 
-            this.AddFaceBtn.Location = new System.Drawing.Point(280, 163);
+            this.AddFaceBtn.Location = new System.Drawing.Point(12, 536);
             this.AddFaceBtn.Name = "AddFaceBtn";
-            this.AddFaceBtn.Size = new System.Drawing.Size(204, 53);
+            this.AddFaceBtn.Size = new System.Drawing.Size(507, 51);
             this.AddFaceBtn.TabIndex = 6;
             this.AddFaceBtn.Text = "Добавить лицо";
             this.AddFaceBtn.UseVisualStyleBackColor = true;
@@ -82,9 +81,9 @@
             // 
             // ValidFaceBtn
             // 
-            this.ValidFaceBtn.Location = new System.Drawing.Point(534, 444);
+            this.ValidFaceBtn.Location = new System.Drawing.Point(543, 536);
             this.ValidFaceBtn.Name = "ValidFaceBtn";
-            this.ValidFaceBtn.Size = new System.Drawing.Size(513, 51);
+            this.ValidFaceBtn.Size = new System.Drawing.Size(507, 51);
             this.ValidFaceBtn.TabIndex = 7;
             this.ValidFaceBtn.Text = "Проверка лица";
             this.ValidFaceBtn.UseVisualStyleBackColor = true;
@@ -92,58 +91,38 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(534, 411);
+            this.textBox1.Location = new System.Drawing.Point(543, 503);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(513, 27);
+            this.textBox1.Size = new System.Drawing.Size(507, 27);
             this.textBox1.TabIndex = 8;
             // 
-            // DeleteBtn
+            // TestBtn
             // 
-            this.DeleteBtn.Location = new System.Drawing.Point(792, 12);
-            this.DeleteBtn.Name = "DeleteBtn";
-            this.DeleteBtn.Size = new System.Drawing.Size(258, 45);
-            this.DeleteBtn.TabIndex = 9;
-            this.DeleteBtn.Text = "Удалить базу лиц";
-            this.DeleteBtn.UseVisualStyleBackColor = true;
-            this.DeleteBtn.Visible = false;
-            this.DeleteBtn.Click += new System.EventHandler(this.DeleteBtn_Click);
+            this.TestBtn.Location = new System.Drawing.Point(12, 479);
+            this.TestBtn.Name = "TestBtn";
+            this.TestBtn.Size = new System.Drawing.Size(507, 51);
+            this.TestBtn.TabIndex = 10;
+            this.TestBtn.Text = "Тест на качество распознавания";
+            this.TestBtn.UseVisualStyleBackColor = true;
+            this.TestBtn.Click += new System.EventHandler(this.TestBtn_Click);
             // 
-            // PhotoAddFaceBtn
+            // AddFaceInPhotoBtn
             // 
-            this.PhotoAddFaceBtn.Location = new System.Drawing.Point(12, 23);
-            this.PhotoAddFaceBtn.Name = "PhotoAddFaceBtn";
-            this.PhotoAddFaceBtn.Size = new System.Drawing.Size(329, 45);
-            this.PhotoAddFaceBtn.TabIndex = 10;
-            this.PhotoAddFaceBtn.Text = "PhotoAddFaceBtn";
-            this.PhotoAddFaceBtn.UseVisualStyleBackColor = true;
-            this.PhotoAddFaceBtn.Click += new System.EventHandler(this.PhotoAddFaceBtn_Click);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(12, 74);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(289, 51);
-            this.button1.TabIndex = 11;
-            this.button1.Text = "TEST";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // textBox2
-            // 
-            this.textBox2.Location = new System.Drawing.Point(12, 131);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(276, 27);
-            this.textBox2.TabIndex = 12;
+            this.AddFaceInPhotoBtn.Location = new System.Drawing.Point(11, 12);
+            this.AddFaceInPhotoBtn.Name = "AddFaceInPhotoBtn";
+            this.AddFaceInPhotoBtn.Size = new System.Drawing.Size(166, 73);
+            this.AddFaceInPhotoBtn.TabIndex = 11;
+            this.AddFaceInPhotoBtn.Text = "Добавить лица из фотосета";
+            this.AddFaceInPhotoBtn.UseVisualStyleBackColor = true;
+            this.AddFaceInPhotoBtn.Click += new System.EventHandler(this.AddFaceInPhotoBtn_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1059, 516);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.PhotoAddFaceBtn);
-            this.Controls.Add(this.DeleteBtn);
+            this.ClientSize = new System.Drawing.Size(1059, 599);
+            this.Controls.Add(this.AddFaceInPhotoBtn);
+            this.Controls.Add(this.TestBtn);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.ValidFaceBtn);
             this.Controls.Add(this.AddFaceBtn);
@@ -159,17 +138,14 @@
         }
 
         #endregion
-
+        public System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button TestBtn;
         private System.Windows.Forms.Button StartBtn;
         private System.Windows.Forms.Button PauseBtn;
         private System.Windows.Forms.Button StopBtn;
         private System.Windows.Forms.Button AddFaceBtn;
         private System.Windows.Forms.Button ValidFaceBtn;
-        public System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button DeleteBtn;
-        private System.Windows.Forms.Button PhotoAddFaceBtn;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Button AddFaceInPhotoBtn;
     }
 }
 

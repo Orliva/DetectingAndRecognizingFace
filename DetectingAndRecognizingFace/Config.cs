@@ -1,31 +1,38 @@
-﻿namespace Config
+﻿using FaceAddToBD.Configuration.Enum;
+
+namespace FaceAddToBD.Configuration
 {
-    public enum HaarCascade
+    namespace Enum
     {
-        Haarcascade_eye,
-        Haarcascade_eye_tree_eyeglasses,
-        Haarcascade_frontalcatface,
-        Haarcascade_frontalcatface_extended,
-        Haarcascade_frontalface_alt,
-        Haarcascade_frontalface_alt_tree,
-        Haarcascade_frontalface_alt2,
-        Haarcascade_frontalface_default,
-        Haarcascade_lefteye_2splits,
-        Haarcascade_profileface,
-        Haarcascade_righteye_2splits
-        //,Haarcascade_smile
+        public enum HaarCascade
+        {
+            Haarcascade_eye,
+            Haarcascade_eye_tree_eyeglasses,
+            Haarcascade_frontalcatface,
+            Haarcascade_frontalcatface_extended,
+            Haarcascade_frontalface_alt,
+            Haarcascade_frontalface_alt_tree,
+            Haarcascade_frontalface_alt2,
+            Haarcascade_frontalface_default,
+            Haarcascade_lefteye_2splits,
+            Haarcascade_profileface,
+            Haarcascade_righteye_2splits
+            //,Haarcascade_smile
+        }
     }
+
     public static class Config
     {
-        public static string FacePhotosPath = @"Source\FacesPhoto\";
-        public static string EigenFaceRecognizerPath = @"Source\EigenFaceRecognizer.txt";
-        public static string FaceListTextFile = @"Source\FaceList.txt";///Заменить на полноценную бд и прикрутить форму для заполнения полей БД
-        public static string ImageFileExtension = ".bmp";
-        public static int DefaultCameraIndex = 0;//0: Default active camera device
-        public static double ScaleFactorCascade = 1.1;
-        public static double MinNeighborsCascade = 3;
-        public static System.Drawing.Size MinSizeCascade = default;
-        public static System.Drawing.Size MaxSizeCascade = default;
+        public readonly static string FacePhotosPath = @"Source\FacesPhoto\";
+        public readonly static string EigenFaceRecognizerPath = @"Source\EigenFaceRecognizer.txt";
+        public readonly static string FaceListTextFile = @"Source\FaceList.txt";///Заменить на полноценную бд и прикрутить форму для заполнения полей БД
+        public readonly static string ImageFileExtension = ".bmp";
+        public readonly static int DefaultCameraIndex = 0;//0: Default active camera device
+        public readonly static double ScaleFactorCascade = 1.1;
+        public readonly static double MinNeighborsCascade = 3;
+        public readonly static System.Drawing.Size MinSizeCascade = default;
+        public readonly static System.Drawing.Size MaxSizeCascade = default;
+        public readonly static string NoFaceInDB = "No face in database!";
 
         public static string TESTPATH = @"Source\Test.txt";
     }

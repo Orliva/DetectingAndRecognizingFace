@@ -9,9 +9,9 @@ namespace FaceAddToBD
         public EigenFaceRecognizer recognizer;
      //   public LBPHFaceRecognizer rec2;
      //   public FisherFaceRecognizer rec3;
-        private readonly Database database;
+        private readonly MySimpleDatabase database;
 
-        public RecognizeFace(Database db)
+        public RecognizeFace(MySimpleDatabase db)
         {
             recognizer = new EigenFaceRecognizer(2, 1.8 * Math.Pow(10.0, 10.0));
             database = db;

@@ -25,7 +25,7 @@ namespace FaceAddToBD.Configuration
     {
         public readonly static string FacePhotosPath = @"Source\FacesPhoto\";
         public readonly static string EigenFaceRecognizerPath = @"Source\EigenFaceRecognizer.txt";
-        public readonly static string FaceListTextFile = @"Source\FaceList.txt";///Заменить на полноценную бд и прикрутить форму для заполнения полей БД
+        public readonly static string FaceListTextFile = @"Source\FaceList.txt";
         public readonly static string ImageFileExtension = ".bmp";
         public readonly static int DefaultCameraIndex = 0;//0: Default active camera device
         public readonly static double ScaleFactorCascade = 1.1;

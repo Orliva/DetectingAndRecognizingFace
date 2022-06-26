@@ -10,63 +10,107 @@ using FaceAddToBD.Configuration;
 using FaceAddToBD.Configuration.Enum;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FaceAddToBD
 {
     class DetectorFace : IDisposable
     {
         #region Field
-        private readonly Emgu.CV.UI.ImageBox imageBox1;
-        private readonly Emgu.CV.UI.ImageBox imageBox2;
+        private readonly Emgu.CV.UI.ImageBox imageBoxColorCNN;
+        private readonly Emgu.CV.UI.ImageBox imageBoxColorHaar;
+        private readonly Emgu.CV.UI.ImageBox imageBoxGrayHaar;
+        private readonly Emgu.CV.UI.ImageBox imageBoxGrayCnn;
         private readonly MainForm form;
         private readonly VideoCapture capture;
         private readonly Pen pen;
         private readonly CascadeClassifier classifier = new CascadeClassifier(
-            HaarCascadePath.GetHaarCascadePath(HaarCascade.Haarcascade_frontalface_alt_tree)
+            HaarCascadePath.GetHaarCascadePath(HaarCascade.Haarcascade_frontalface_alt_tree) //решающие деревья (набор вейетов) - Haarcascade_frontalface_alt_tree
             );
-        private readonly Image<Bgr, byte> im;
-        private readonly Database database;
+        private readonly Image<Bgr, byte> sourceIm;
+        private Image<Bgr, byte> CNNImage = null;
+        private readonly MySimpleDatabase database;
         private readonly RecognizeFace recognizer;
-        private Image<Gray, byte> detectedIm;
-        private Image<Gray, byte> grayIm;
+        private Image<Gray, byte> detectedImCNN;
+        private Image<Gray, byte> detectedImHaar;
+        private Image<Gray, byte> tmpGrayImHaar;
         private Bitmap bm;
         private Graphics graphics;
         private Rectangle[] faces;
-        #endregion
 
-        #region Constructor
-        public DetectorFace(MainForm form)
+        UltraFaceDotNet.UltraFaceParameter param = new UltraFaceDotNet.UltraFaceParameter()
         {
-            database = new Database();
+            BinFilePath = "RFB-320.bin",
+            ParamFilePath = "RFB-320.param",
+            IouThreshold = 0.3f,
+            InputLength = 100,
+            InputWidth = 100,
+            NumThread = 1,
+            ScoreThreshold = 0.7f
+        };
+    #endregion
+
+    #region Constructor
+    public DetectorFace(MainForm form)
+        {
+            database = new MySimpleDatabase();
             recognizer = new RecognizeFace(database);
             database.Recognizer = recognizer;
 
             this.form = form;
-            imageBox1 = new Emgu.CV.UI.ImageBox
+            imageBoxColorHaar = new Emgu.CV.UI.ImageBox
             {
-                Location = new Point(12, 12),
-                Size = new Size(form.Width / 2 - 12, form.Height - 80), //просчитать размеры для оптимального детектирования картинки в зависимости от скалирования каскада
-                Name = "imageBox1",
-                TabIndex = 2,
+                Location = new Point(form.Width / 2 + 12, 12),
+                Size = new Size(form.Width / 2 - 36, form.Height - 180),
+                Name = "imageBox2",
                 TabStop = false,
                 FunctionalMode = Emgu.CV.UI.ImageBox.FunctionalModeOption.Minimum,
                 BorderStyle = BorderStyle.None,
                 BackgroundImageLayout = ImageLayout.Stretch
-        };
-            imageBox2 = new Emgu.CV.UI.ImageBox
+            };
+
+            imageBoxGrayHaar = new Emgu.CV.UI.ImageBox
             {
-                Location = new Point(form.Width / 2 - 12, 12),
-                Size = new Size(form.Width / 2 - 12, form.Height - 80), //просчитать размеры для оптимального детектирования картинки в зависимости от скалирования каскада
-                Name = "imageBox2",
-                TabIndex = 2,
+                Location = new Point(form.Width / 2 + 12 + imageBoxColorHaar.Width / 2 + 100,
+                    12),
+                Size = new Size(imageBoxColorHaar.Width / 2 - 100, imageBoxColorHaar.Height / 2 - 100),
+                Name = "imageBox3",
                 TabStop = false,
                 FunctionalMode = Emgu.CV.UI.ImageBox.FunctionalModeOption.Minimum,
                 BorderStyle = BorderStyle.None,
-                BackgroundImageLayout = ImageLayout.Tile
+                BackgroundImageLayout = ImageLayout.Stretch
             };
 
-            this.form.Controls.Add(imageBox1);
-            this.form.Controls.Add(imageBox2);
+            imageBoxColorCNN = new Emgu.CV.UI.ImageBox
+            {
+                Location = new Point(12, 12),
+                Size = new Size(form.Width / 2 - 12, form.Height - 180), //просчитать размеры для оптимального детектирования картинки в зависимости от скалирования каскада
+                Name = "imageBox1",
+                TabStop = false,
+                FunctionalMode = Emgu.CV.UI.ImageBox.FunctionalModeOption.Minimum,
+                BorderStyle = BorderStyle.None,
+                BackgroundImageLayout = ImageLayout.Stretch
+            };
+
+            imageBoxGrayCnn = new Emgu.CV.UI.ImageBox
+            {
+                Location = new Point(12 + imageBoxColorCNN.Width / 2 + 100,
+                    12),
+                Size = new Size(imageBoxColorCNN.Width / 2 - 100, imageBoxColorCNN.Height / 2 - 100), //просчитать размеры для оптимального детектирования картинки в зависимости от скалирования каскада
+                Name = "imageBox4",
+                TabStop = false,
+                FunctionalMode = Emgu.CV.UI.ImageBox.FunctionalModeOption.Minimum,
+                BorderStyle = BorderStyle.None,
+                BackgroundImageLayout = ImageLayout.Stretch
+            };
+
+            this.form.Controls.Add(imageBoxColorCNN);
+            this.form.Controls.Add(imageBoxColorHaar);
+            this.form.Controls.Add(imageBoxGrayHaar);
+            this.form.Controls.Add(imageBoxGrayCnn);
+
+            imageBoxGrayCnn.BringToFront();
+            imageBoxGrayHaar.BringToFront();
 
             capture = new VideoCapture(Configuration.Config.DefaultCameraIndex, VideoCapture.API.Any);
             //Смотрим возможности VideoCapture
@@ -114,17 +158,19 @@ namespace FaceAddToBD
                form.listBox1.Items.Add(capture.GetCaptureProperty(CapProp.AutoExposure));
             */
             #endregion
-            capture.SetCaptureProperty(CapProp.FrameWidth, imageBox1.Width);
-            capture.SetCaptureProperty(CapProp.FrameHeight, imageBox1.Height);
-            capture.SetCaptureProperty(CapProp.Fps, 30.0);
+            //capture.SetCaptureProperty(CapProp.FrameWidth, imageBox1.Width);
+            //capture.SetCaptureProperty(CapProp.FrameHeight, imageBox1.Height);
+            //capture.SetCaptureProperty(CapProp.Fps, 30.0);
 
             pen = new Pen(Color.Red, 3);
 
             database.TryRestoreDB();
 
-            im = capture.QueryFrame().ToImage<Bgr, byte>();
-            detectedIm = null;
-            grayIm = null;
+            sourceIm = capture.QueryFrame().ToImage<Bgr, byte>();
+            detectedImCNN = null;
+            detectedImHaar = null;
+
+            tmpGrayImHaar = null;
             capture.ImageGrabbed += Capture_ImageGrabbed;
         }
         #endregion
@@ -144,8 +190,8 @@ namespace FaceAddToBD
         public void ValidFace()
         {
             form.textBox1.Text = "";
-            if (detectedIm != null)
-                form.textBox1.Text = ValidFace(detectedIm);
+            if (detectedImCNN != null)
+                form.textBox1.Text = ValidFace(detectedImCNN);
             else
                 MessageBox.Show("Image for detection not found", "Error", MessageBoxButtons.OK);
         }
@@ -156,13 +202,13 @@ namespace FaceAddToBD
         public void AddFace()
         {
             capture.Pause();
-            if (detectedIm == null)
+            if (detectedImCNN == null)
             {
                 MessageBox.Show("No face detected!", "No face detected error", MessageBoxButtons.OK);
                 capture.Start();
                 return;
             }
-            ImpAddFace(detectedIm);
+            ImpAddFace(detectedImCNN);
         }
         #endregion
 
@@ -193,22 +239,94 @@ namespace FaceAddToBD
         /// <param name="e"></param>
         private void Capture_ImageGrabbed(object sender, EventArgs e)
         {
-            if (capture.Retrieve(im))
+            //Работает не в основном потоке, try для корректного завершения программы
+            try
             {
-                grayIm = im.Convert<Gray, byte>();
-                faces = classifier.DetectMultiScale(image:grayIm, scaleFactor: 1.1, minNeighbors: 0);
-                bm = im.ToBitmap();
-                if (faces.Length != 0)
+                //Получаем кадр из видеопотока
+                if (capture.Retrieve(sourceIm))
                 {
-                    graphics = Graphics.FromImage(bm);
-                    detectedIm = grayIm.GetSubRect(faces[0]).Resize(100,100, Inter.Cubic);///Самый маленький квадрат
-                    graphics.DrawRectangle(pen, faces[0]);
-                    imageBox1.BackgroundImage = detectedIm.ToBitmap();
-                    if (testFlag)
-                        ImpTest(detectedIm, "Ivan", 300);
+                    ////Определяем лицо методом хаара
+                    DetectHaar(sourceIm);
+
+                    ////Определяем лицо нейронкой
+                    DetectCNN(sourceIm);
                 }
-                imageBox2.BackgroundImage = bm;
             }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        private void DetectHaar(Image<Bgr, byte> imageSource, bool isSmallesFind = true)
+        {
+            //Определяем лицо методом хаара
+            tmpGrayImHaar = imageSource.Convert<Gray, byte>();
+            faces = classifier.DetectMultiScale(image: tmpGrayImHaar, scaleFactor: 1.1, minNeighbors: 0);
+            bm = imageSource.ToBitmap();
+            if (faces.Length != 0)
+            {
+                if (isSmallesFind)
+                    GetSmallesBoxes();
+                else
+                    GetAllBoxes();
+                imageBoxGrayHaar.BackgroundImage = detectedImHaar.ToBitmap();
+                //if (testFlag)
+                //  ImpTest(detectedIm, "Ivan", 300);
+            }
+            imageBoxColorHaar.BackgroundImage = bm;
+        }
+
+        private void GetSmallesBoxes()
+        {
+            graphics = Graphics.FromImage(bm);
+            detectedImHaar = tmpGrayImHaar.GetSubRect(faces[0]).Resize(100, 100, Inter.Cubic);///Самый маленький квадрат
+            graphics.DrawRectangle(pen, faces[0]);
+        }
+
+        private void GetAllBoxes()
+        {
+            graphics = Graphics.FromImage(bm);
+            foreach (var i in faces)
+            {
+                detectedImHaar = tmpGrayImHaar.GetSubRect(i).Resize(100, 100, Inter.Cubic);///Самый маленький квадрат
+                graphics.DrawRectangle(pen, i);
+            }
+        }
+
+        private void DetectCNN(Image<Bgr, byte> imageSource)
+        {
+            //Определяем лицо нейронкой
+            using (var ultraFace = UltraFaceDotNet.UltraFace.Create(param))
+            {
+                CNNImage = imageSource.Resize(1000, 1000, Inter.Cubic);
+                using var inMat = NcnnDotNet.Mat.FromPixels(CNNImage.Mat.DataPointer, NcnnDotNet.PixelType.Bgr2Rgb, 1000, 1000);
+
+                var faceInfos = ultraFace.Detect(inMat).ToArray();
+
+                for (var j = 0; j < faceInfos.Length; j++)
+                {
+                    var face = faceInfos[j];
+                    var pt1 = new NcnnDotNet.OpenCV.Point<float>(face.X1, face.Y1);
+                    var pt2 = new NcnnDotNet.OpenCV.Point<float>(face.X2, face.Y2);
+                    var rect = new System.Drawing.Rectangle((int)face.X1, (int)face.Y1, (int)(face.X2 - face.X1), (int)(face.Y2 - face.Y1));
+
+                    detectedImCNN = CNNImage.Convert<Gray, byte>().GetSubRect(rect).Resize(100, 100, Inter.Cubic);
+                    CNNImage.Draw(rect, new Bgr(181, 68, 157), 2);
+                }
+                imageBoxColorCNN.BackgroundImage = CNNImage.ToBitmap();
+                imageBoxGrayCnn.BackgroundImage = detectedImCNN?.ToBitmap();
+            }
+        }
+
+        public void DetectHaar(string pathToPhoto, bool isSmallestFind)
+        {
+            DetectHaar(new Image<Bgr, byte>(pathToPhoto), isSmallestFind);
+        }
+
+        public void DetectCNN(string pathToPhoto)
+        {
+            DetectCNN(new Image<Bgr, byte>(pathToPhoto));
         }
 
         private bool IsMaybePersonInclude(Image<Gray, byte> image, out string name)
@@ -251,7 +369,7 @@ namespace FaceAddToBD
             {
                 //С помощью формы получаем экземпляр FaceData и проверяем, есть ли уже юзер с таким id
                 //Если нет, то добавляем нового юзера, иначе работаем с уже существующим (меняем только текущую фотографию в FaceData)
-                if (new PersonForm(database.FaceList, detectedIm).MyShowDialog(out FaceData faceData) != DialogResult.Cancel)
+                if (new PersonForm(database.FaceList, detectedImCNN).MyShowDialog(out FaceData faceData) != DialogResult.Cancel)
                 {
                     if (!IsFaceDataInclude(in faceData))
                     {
@@ -270,7 +388,7 @@ namespace FaceAddToBD
             }
             Task.Run((Action)(() => recognizer.TrainRecognizer())).Wait();
             MessageBox.Show("Successful.");
-            detectedIm = null;
+            detectedImCNN = null;
             capture.Start();
         }
         #endregion
@@ -328,7 +446,7 @@ namespace FaceAddToBD
                     return;
                 tmpIm = null;
             }
-            imageBox1.Invoke((Action)(() => imageBox1.BackgroundImage = bm));
+            imageBoxColorCNN.Invoke((Action)(() => imageBoxColorCNN.BackgroundImage = bm));
         }
 
         /// <summary>
@@ -421,16 +539,16 @@ namespace FaceAddToBD
                 {
                     faces = null;
                 }
-                imageBox1?.Dispose();
-                imageBox2?.Dispose();
+                imageBoxColorCNN?.Dispose();
+                imageBoxColorHaar?.Dispose();
                 capture?.Dispose();
                 pen?.Dispose();
                 classifier?.Dispose();
-                im?.Dispose();
+                sourceIm?.Dispose();
                 database?.Dispose();
                 recognizer?.Dispose();
-                detectedIm?.Dispose();
-                grayIm?.Dispose();
+                detectedImCNN?.Dispose();
+                tmpGrayImHaar?.Dispose();
                 bm?.Dispose();
                 graphics?.Dispose();
                 disposedValue = true;

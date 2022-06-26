@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace FaceAddToBD
 {
-    class Database : IDisposable
+    class MySimpleDatabase : IDisposable
     {
         public List<FaceData> FaceList { get; set; }
         public VectorOfMat ImageList { get; set; }
@@ -20,7 +20,7 @@ namespace FaceAddToBD
 
         private int countPhotosBefore;
 
-        public Database()
+        public MySimpleDatabase()
         {
             FaceList = new List<FaceData>();
             ImageList = new VectorOfMat();
@@ -43,7 +43,7 @@ namespace FaceAddToBD
         }
 
         /// <summary>
-        /// Добавляем юзера в базу
+        /// Добавляем юзера в базу (файлик в случае нативных систем, ну или тестовых, как у меня)
         /// </summary>
         /// <param name="faceData"></param>
         /// <returns></returns>
@@ -201,7 +201,7 @@ namespace FaceAddToBD
             }
         }
 
-         ~Database()
+         ~MySimpleDatabase()
          {
              Dispose(disposing: false);
          }

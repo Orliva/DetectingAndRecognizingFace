@@ -35,13 +35,14 @@
             this.AddFaceBtn = new System.Windows.Forms.Button();
             this.ValidFaceBtn = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.TestBtn = new System.Windows.Forms.Button();
             this.AddFaceInPhotoBtn = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.SuspendLayout();
             // 
             // StartBtn
             // 
-            this.StartBtn.Location = new System.Drawing.Point(12, 433);
+            this.StartBtn.Location = new System.Drawing.Point(12, 526);
             this.StartBtn.Name = "StartBtn";
             this.StartBtn.Size = new System.Drawing.Size(165, 40);
             this.StartBtn.TabIndex = 3;
@@ -51,7 +52,7 @@
             // 
             // PauseBtn
             // 
-            this.PauseBtn.Location = new System.Drawing.Point(183, 433);
+            this.PauseBtn.Location = new System.Drawing.Point(183, 526);
             this.PauseBtn.Name = "PauseBtn";
             this.PauseBtn.Size = new System.Drawing.Size(165, 40);
             this.PauseBtn.TabIndex = 4;
@@ -61,7 +62,7 @@
             // 
             // StopBtn
             // 
-            this.StopBtn.Location = new System.Drawing.Point(354, 433);
+            this.StopBtn.Location = new System.Drawing.Point(354, 526);
             this.StopBtn.Name = "StopBtn";
             this.StopBtn.Size = new System.Drawing.Size(165, 40);
             this.StopBtn.TabIndex = 5;
@@ -71,7 +72,7 @@
             // 
             // AddFaceBtn
             // 
-            this.AddFaceBtn.Location = new System.Drawing.Point(12, 536);
+            this.AddFaceBtn.Location = new System.Drawing.Point(12, 572);
             this.AddFaceBtn.Name = "AddFaceBtn";
             this.AddFaceBtn.Size = new System.Drawing.Size(507, 51);
             this.AddFaceBtn.TabIndex = 6;
@@ -81,7 +82,7 @@
             // 
             // ValidFaceBtn
             // 
-            this.ValidFaceBtn.Location = new System.Drawing.Point(543, 536);
+            this.ValidFaceBtn.Location = new System.Drawing.Point(543, 572);
             this.ValidFaceBtn.Name = "ValidFaceBtn";
             this.ValidFaceBtn.Size = new System.Drawing.Size(507, 51);
             this.ValidFaceBtn.TabIndex = 7;
@@ -91,23 +92,14 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(543, 503);
+            this.textBox1.Location = new System.Drawing.Point(543, 529);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(507, 27);
             this.textBox1.TabIndex = 8;
             // 
-            // TestBtn
-            // 
-            this.TestBtn.Location = new System.Drawing.Point(12, 479);
-            this.TestBtn.Name = "TestBtn";
-            this.TestBtn.Size = new System.Drawing.Size(507, 51);
-            this.TestBtn.TabIndex = 10;
-            this.TestBtn.Text = "Тест на качество распознавания";
-            this.TestBtn.UseVisualStyleBackColor = true;
-            this.TestBtn.Click += new System.EventHandler(this.TestBtn_Click);
-            // 
             // AddFaceInPhotoBtn
             // 
+            this.AddFaceInPhotoBtn.Enabled = false;
             this.AddFaceInPhotoBtn.Location = new System.Drawing.Point(11, 12);
             this.AddFaceInPhotoBtn.Name = "AddFaceInPhotoBtn";
             this.AddFaceInPhotoBtn.Size = new System.Drawing.Size(166, 73);
@@ -116,20 +108,38 @@
             this.AddFaceInPhotoBtn.UseVisualStyleBackColor = true;
             this.AddFaceInPhotoBtn.Click += new System.EventHandler(this.AddFaceInPhotoBtn_Click);
             // 
-            // Form1
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(12, 495);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(507, 25);
+            this.button1.TabIndex = 12;
+            this.button1.Text = "Распознать по фотографии";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.AddExtension = false;
+            this.openFileDialog1.DefaultExt = "png";
+            this.openFileDialog1.Filter = "Image files (*.jpg)|*.jpg|Png Image (*.png)|*.png|Bitmap files (*.bmp)|*.bmp|ALL " +
+    "|*.*";
+            this.openFileDialog1.Title = "Выберите фото";
+            // 
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1059, 599);
+            this.ClientSize = new System.Drawing.Size(1059, 646);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.AddFaceInPhotoBtn);
-            this.Controls.Add(this.TestBtn);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.ValidFaceBtn);
             this.Controls.Add(this.AddFaceBtn);
             this.Controls.Add(this.StopBtn);
             this.Controls.Add(this.PauseBtn);
             this.Controls.Add(this.StartBtn);
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
@@ -139,13 +149,14 @@
 
         #endregion
         public System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button TestBtn;
         private System.Windows.Forms.Button StartBtn;
         private System.Windows.Forms.Button PauseBtn;
         private System.Windows.Forms.Button StopBtn;
         private System.Windows.Forms.Button AddFaceBtn;
         private System.Windows.Forms.Button ValidFaceBtn;
         private System.Windows.Forms.Button AddFaceInPhotoBtn;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }
 
